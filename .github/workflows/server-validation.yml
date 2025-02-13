@@ -1,0 +1,37 @@
+name: Server Validation
+
+on:
+  workflow_dispatch:
+  #schedule:
+    #- cron: '0 2 * * *' # Runs at 2 AM daily
+
+jobs:
+  validate-servers:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Validation Scripts
+        shell: pwsh
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          $Username = "$env:SERVER_USERNAME"
+          $Password = "$env:SERVER_PASSWORD"
+
+          Import-Module ./PingTest.psm1
+          Test-ServerPing
+
+          Import-Module ./RDPStatus.psm1
+          Check-RDPStatus -Username $Username -Password $Password
+          
+          Import-Module ./LastReboot.psm1
+          Get-LastRebootTime -Username $Username -Password $Password
+          
+          Import-Module ./RDPEventLog.psm1
+          Get-RDPEventLog -Username $Username -Password $Password
+          
+          ./SendEmail.ps1 -Recipient "admin@example.com"
