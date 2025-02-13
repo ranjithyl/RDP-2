@@ -34,4 +34,4 @@ jobs:
           Import-Module ./RDPEventLog.psm1
           Get-RDPEventLog -Username $Username -Password $Password
           
-          ./SendEmail.ps1 -Recipient "ranjithyl95@yahoo.com.com"
+          ./SendEmail.ps1 -Recipient "ranjithyl95@yahoo.com"
