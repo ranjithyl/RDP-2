@@ -2,7 +2,7 @@ param (
     [string]$Recipient = "ranjithyl95@yahoo.com"
 )
 
-$smtpServer = "smtp.gmail.com"
+$smtpServer = "smtp.mail.yahoo.com"
 $from = "noreply@example.com"
 
 $subject = "Windows Server Validation Report"
