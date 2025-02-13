@@ -25,13 +25,13 @@ jobs:
           Import-Module ./PingTest.psm1
           Test-ServerPing
 
-          Import-Module ./RDPStatus.psm1
-          Check-RDPStatus -Username $Username -Password $Password
+          #Import-Module ./RDPStatus.psm1
+          #Check-RDPStatus -Username $Username -Password $Password
           
-          Import-Module ./LastReboot.psm1
-          Get-LastRebootTime -Username $Username -Password $Password
+          #Import-Module ./LastReboot.psm1
+          #Get-LastRebootTime -Username $Username -Password $Password
           
-          Import-Module ./RDPEventLog.psm1
-          Get-RDPEventLog -Username $Username -Password $Password
+          #Import-Module ./RDPEventLog.psm1
+          #Get-RDPEventLog -Username $Username -Password $Password
           
           ./SendEmail.ps1 -Recipient "ranjithyl95@yahoo.com"
