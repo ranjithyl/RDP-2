@@ -1,9 +1,9 @@
-name: Server Validation
+name: Validate Windows Servers
 
 on:
-  workflow_dispatch:
-  #schedule:
-    #- cron: '0 2 * * *' # Runs at 2 AM daily
+  schedule:
+    - cron: "0 6 * * *" # Runs daily at 6 AM UTC
+  workflow_dispatch: # Manual trigger
 
 jobs:
   validate-servers:
@@ -13,25 +13,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Run Validation Scripts
+      - name: Run PowerShell Script
         shell: pwsh
-        env:
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          $Username = "$env:SERVER_USERNAME"
-          $Password = "$env:SERVER_PASSWORD"
+          $scriptPath = "$env:GITHUB_WORKSPACE/scripts/validate_rdp.ps1"
+          $serverList = "$env:GITHUB_WORKSPACE/servers.txt"
+          $outputCsv = "$env:GITHUB_WORKSPACE/RDP_Report.csv"
+          $username = "${{ secrets.ADMIN_USERNAME }}"
+          $password = "${{ secrets.ADMIN_PASSWORD }}"
 
-          Import-Module ./PingTest.psm1
-          Test-ServerPing
+          # Execute the script
+          & $scriptPath -ServerListPath $serverList -OutputCsvPath $outputCsv -Username $username -Password $password
 
-          #Import-Module ./RDPStatus.psm1
-          #Check-RDPStatus -Username $Username -Password $Password
-          
-          #Import-Module ./LastReboot.psm1
-          #Get-LastRebootTime -Username $Username -Password $Password
-          
-          #Import-Module ./RDPEventLog.psm1
-          #Get-RDPEventLog -Username $Username -Password $Password
-          
-          ./SendEmail.ps1 -Recipient "ranjithyl95@yahoo.com"
+      - name: Send Email with Report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.example.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "RDP Server Validation Report"
+          body: "Attached is the latest RDP validation report."
+          to: recipient@example.com
+          from: "GitHub Actions <noreply@example.com>"
+          attachments: "RDP_Report.csv"
